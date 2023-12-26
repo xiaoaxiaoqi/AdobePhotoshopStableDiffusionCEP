@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<ExtensionManifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ExtensionBundleId="com.my.test.body" ExtensionBundleVersion="1.0" Version="6.0"> <!-- MAJOR-VERSION-UPDATE-MARKER -->
+    <ExtensionList>
+        <Extension Id="com.my.test.StableDiffusion" Version="6.1.0"/>
+    </ExtensionList>
+    <ExecutionEnvironment>
+        <HostList>
+            <Host Name="AEFT" Version="[0.0,99.9]"/>
+            <Host Name="PPRO" Version="[0.0,99.9]"/>
+            <Host Name="ILST" Version="[0.0,99.9]"/>
+            <Host Name="PHXS" Version="[0.0,99.9]"/>
+            <Host Name="FLPR" Version="[0.0,99.9]"/>
+        </HostList>
+        <LocaleList>
+            <Locale Code="All"/>
+        </LocaleList>
+        <RequiredRuntimeList>
+            <RequiredRuntime Name="CSXS" Version="9.0"/>
+        </RequiredRuntimeList>
+    </ExecutionEnvironment>
+    <DispatchInfoList>
+        <Extension Id="com.my.test.StableDiffusion">
+            <DispatchInfo>
+                <Resources>
+                    <MainPath>./index.html</MainPath>
+                    <ScriptPath>./jsx/core.jsx</ScriptPath>
+                    <CEFCommandLine>
+                        <Parameter>--enable-nodejs</Parameter>
+                    </CEFCommandLine>
+                </Resources>
+                <Lifecycle>
+                    <AutoVisible>true</AutoVisible>
+                </Lifecycle>
+                <UI>
+                    <Type>Panel</Type>
+                    <Menu>xiaoaxiaoqi</Menu>
+                    <Geometry>
+                        <Size>
+                            <Height>350</Height>
+                            <Width>420</Width>
+                        </Size>
+                        <MaxSize>
+                            <Height>3000</Height>
+                            <Width>3000</Width>
+                        </MaxSize>
+                        <MinSize>
+                            <Height>350</Height>
+                            <Width>420</Width>
+                        </MinSize>
+                    </Geometry>
+                    <Icons>
+
+                    </Icons>
+                </UI>
+            </DispatchInfo>
+        </Extension>
+    </DispatchInfoList>
+</ExtensionManifest>
+

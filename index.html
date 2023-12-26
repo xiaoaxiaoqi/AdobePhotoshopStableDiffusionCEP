@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>StableDiffusion</title>
+    <link href="./layui/css/layui.css" rel="stylesheet">
+    <style>
+        .layui-tab-title li {
+            padding: 0 1px;
+            min-width: 60px;
+            color: #ffffff;
+        }
+
+        .layui-card {
+            background-color: #424242;
+        }
+
+        .layui-card-header {
+            border-bottom: 1px solid #535353;
+            color: #FFF;
+        }
+
+        .layui-form-item {
+            margin-bottom: 8px;
+        }
+
+        .layui-form-pane .layui-form-label {
+            color: #FFF;
+            background-color: #535353;
+            border-width: 0px
+        }
+
+        .layui-form-mid {
+            color: #FFF;
+        }
+
+        .layui-colla-title {
+            background-color: #535353;
+        }
+
+        .layui-colla-title {
+            color: #FFF;
+        }
+
+        .layui-colla-content {
+            border-color: transparent;
+        }
+
+        .layui-collapse {
+            border-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .input-block-slide {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slider {
+            width: 100%;
+            margin: 0 10px;
+        }
+
+        /* 设置单选框的文字颜色为蓝色 */
+        .layui-input-radio input[type="radio"] {
+            color: blue;
+        }
+
+        /* 设置单选框选中时的文字颜色为绿色 */
+        .layui-input-radio {
+            color: #ffffff;
+        }
+
+        .layui-form-pane .layui-form-label.module-detail-sliders {
+            width: 200px;
+        }
+
+        .layui-upload-drag {
+            padding: 15px;
+        }
+
+        .layui-icon-tips {
+            font-size: 3px;
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body style="padding: 15px;background: #535353;">
+
+<div class="layui-tab layui-tab-brief" lay-filter="docDemoTabBrief">
+    <ul class="layui-tab-title">
+        <li class="layui-this">文生图</li>
+        <li>图升图</li>
+        <li>AI填充</li>
+        <li>实时渲染</li>
+        <li>作者</li>
+    </ul>
+    <div class="layui-tab-content">
+        <div class="layui-tab-item layui-show">
+            <div class="layui-card">
+                <div class="layui-card-header">基本参数</div>
+                <div class="layui-card-body">
+                    <form class="layui-form layui-form-pane" action="" lay-filter="txt2img">
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">
+                                模型
+                                <i class="layui-icon layui-icon-tips" lay-tips="根据图片风格选择对应模型"></i>
+                            </label>
+                            <div class="layui-input-block">
+                                <select name="models" lay-filter="models">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label">
+                                正向提示词
+                                <i class="layui-icon layui-icon-tips"
+                                   lay-tips="你想要图片出现什么元素<br/><br/>默认的提示词编写是使用逗号分隔的，有先后顺序区别的，靠前的提示词权重比较高。<br/><br/>在提示词中使用英文括号，代表着增减权重。"></i>
+                            </label>
+                            <div class="layui-input-block">
+                                <textarea name="prompt" placeholder="请输入内容" class="layui-textarea"></textarea>
+                            </div>
+                        </div>
+                        <div class="layui-form-item layui-form-text">
+                            <label class="layui-form-label">
+                                反向提示词
+                                <i class="layui-icon layui-icon-tips" lay-tips="你不想图片中出现什么元素"></i>
+                            </label>
+                            <div class="layui-input-block">
+										<textarea name="negative_prompt" placeholder="请输入内容"
+                                                  class="layui-textarea"></textarea>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">
+                                采样器
+                                <i class="layui-icon layui-icon-tips"
+                                   lay-tips="兼顾生成耗时、重现性、图片质量：DPM++ 2M Karras，20-30步；UniPC，20-30步；<br/><br/>注重质量，且不关心重现性：DPM++SDE Karras，10-15步；DDIM，10-15步；<br/><br/>注重重现性：不要使用任何ancestral采样器（名字里面带a或SDE）"></i>
+                            </label>
+                            <div class="layui-input-block">
+                                <select name="sampler_index" lay-filter="sampler_index">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">
+                                CFG
+                                <i class="layui-icon layui-icon-tips" lay-tips="提示词引导系数 "></i>
+                            </label>
+                            <div class="layui-input-block">
+                                <input type="number" name="cfg_scale" lay-verify="required" autocomplete="off"
+                                       placeholder="请输入" value="7" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">
+                                步数
+                                <i class="layui-icon layui-icon-tips"
+                                   lay-tips=" Stable Diffuison针对你的提示词描述，使用多少步将其绘制出来。每增加一步迭代，AI都有更多的机会来比对提示和当前结果，并进行调整。更高的迭代步数需要更多的计算时间。但是，并不意味着步数越高，质量就越好。步数高于过高，反而容易产生畸变,建议20"></i>
+                            </label>
+                            <div class="layui-input-block">
+                                <input type="number" name="steps" lay-verify="required" autocomplete="off"
+                                       placeholder="请输入" value="20" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">
+                                生成数量
+                                <i class="layui-icon layui-icon-tips" lay-tips="你想要生成的图片数量,建议1-8张"></i>
+                            </label>
+                            <div class="layui-input-block">
+                                <input type="number" name="batch_size" lay-verify="required" autocomplete="off"
+                                       placeholder="请输入" value="1" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">
+                                图片宽度
+                                <i class="layui-icon layui-icon-tips" lay-tips="图片宽度"></i>
+                            </label>
+                            <div class="layui-input-block">
+                                <input type="number" name="width" lay-verify="required" autocomplete="off"
+                                       placeholder="请输入" value="512" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">
+                                图片高度
+                                <i class="layui-icon layui-icon-tips" lay-tips="图片高度"></i>
+                            </label>
+                            <div class="layui-input-block">
+                                <input type="number" name="height" lay-verify="required" autocomplete="off"
+                                       placeholder="请输入" value="512" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-form-item" style="text-align: center;">
+                            <button type="submit" class="layui-btn" lay-submit="" lay-filter="txt2img">立即生成
+                            </button>
+                            <button type="button" class="layui-btn layui-btn-normal"
+                                    id="LAY-component-form-setval">Demo
+                            </button>
+                        </div>
+                    </form>
+                    <div class="layui-row my-image-container">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-tab-item"></div>
+        <div class="layui-tab-item"></div>
+        <div class="layui-tab-item"></div>
+        <div class="layui-tab-item">
+            <h3 style="font-size: 23px;color: #FFFFFF">作者：小阿小七</h3>
+            <h3 style="font-size: 23px;color: #FFFFFF">QQ：858438539</h3>
+        </div>
+    </div>
+</div>
+<script src="./layui/layui.js"></script>
+<script>
+    layui.use(['form', 'util', 'laydate', 'jquery', 'slider'], function () {
+        var form = layui.form;
+        var layer = layui.layer;
+        var util = layui.util;
+        var laydate = layui.laydate;
+        var slider = layui.slider;
+        $ = layui.jquery;
+        var control_data = [];
+        var module_list = [];
+        var model_list = [];
+
+        // 请求头
+        var headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        };
+        // 初始化加载 Stable Diffusion 模型数据
+        getModel();
+
+        /**
+         * 获取 Stable Diffusion 模型数据
+         */
+        function getModel() {
+            $.get('http://127.0.0.1:7860/sdapi/v1/sd-models', function (data, status) {
+                if (status === 'success') {
+                    console.log("加载模型数据:", data);
+                    // 请求成功，将返回的数据添加到下拉列表中
+                    var select = $('select[name="models"]');
+                    $.each(data, function (index, item) {
+                        select.append('<option value="' + item.title + '">' + item.title +
+                            '</option>');
+                    });
+                    // 重新渲染表单元素
+                    var form = layui.form;
+                    form.render('select');
+                } else {
+                    // 请求失败，弹出错误信息
+                    layer.alert('加载模型数据失败,请检查网络是否正常,错误信息：' + status);
+                }
+            });
+        }
+
+        // 初始化加载 Stable Diffusion 采样器数据
+        getSamplers();
+
+        /**
+         * 获取 Stable Diffusion 采样器数据
+         */
+        function getSamplers() {
+            $.get('http://127.0.0.1:7860/sdapi/v1/samplers', function (data, status) {
+                if (status === 'success') {
+                    console.log("加载采样器数据:", data);
+                    // 请求成功，将返回的数据添加到下拉列表中
+                    var select = $('select[name="sampler_index"]');
+                    $.each(data, function (index, item) {
+                        select.append('<option value="' + item.name + '">' + item.name +
+                            '</option>');
+                    });
+                    // 重新渲染表单元素
+                    var form = layui.form;
+                    form.render('select');
+                } else {
+                    // 请求失败，弹出错误信息
+                    layer.alert('加载采样器数据失败,请检查网络是否正常,错误信息：' + status);
+                }
+            });
+        }
+
+        /**
+         * 下拉列表框选择事件·Stable Diffusion 模型
+         */
+        form.on('select(models)', function (data) {
+            console.log('切换模型:', data.value);
+            // Loading 0代表加载的风格，支持0-2
+            var index = layer.load(0, {
+                shade: false
+            });
+            $.ajax({
+                url: 'http://127.0.0.1:7860/sdapi/v1/options',
+                type: 'POST',
+                data: JSON.stringify({
+                    sd_model_checkpoint: data.value
+                }),
+                headers: headers,
+                success: function (response) {
+                    // 请求成功，处理响应数据
+                    layer.close(index)
+                    layer.msg('切换模型成功', {
+                        icon: 1
+                    });
+                },
+                error: function (xhr, status, error) {
+                    // 请求失败，处理错误信息
+                    layer.close(index)
+                    layer.msg('切换模型失败,请检查网络是否正常', {
+                        icon: 5
+                    });
+                }
+            });
+        });
+        form.on('submit(txt2img)', function (data) {
+            // Loading 0代表加载的风格，支持0-2
+            var index = layer.load(0, {
+                shade: false
+            });
+            $.ajax({
+                url: 'http://127.0.0.1:7860/sdapi/v1/txt2img',
+                type: 'POST',
+                data: JSON.stringify(data.field),
+                headers: headers,
+                success: function (response) {
+                    // 请求成功，处理响应数据
+                    // console.log(response);
+                    layer.close(index)
+                    // 循环遍历 images 数组，为每个图片创建 HTML 结构并追加到 '.my-image-container'
+                    for (var i = 0; i < response.images.length; i++) {
+                        var newHtml = '<div class="layui-col-xs3">' +
+                            '<div class="grid-demo grid-demo-bg1">' +
+                            '<img class="zoom-img" src="data:image/png;base64,' + response
+                                .images[i] +
+                            '" alt="" style="width: 100%;" onclick="zoomImage(this);">' +
+                            '</div></div>';
+                        // 将新的 HTML 追加到 '.my-image-container' 元素中
+                        $('.my-image-container').append(newHtml);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    // 请求失败，处理错误信息
+                    layer.msg('绘画失败失败,请检查网络是否正常', {
+                        icon: 5
+                    });
+                    layer.close(index)
+                }
+            });
+            return false;
+        });
+        // 表单赋值
+        layui.$('#LAY-component-form-setval').on('click', function () {
+            form.val('txt2img', {
+                "prompt": "masterpiece, best quality,realistic,(realskin:1.5),1girl,outdoor,low_key,longhair,parted bangs,cherry blossoms, (river:1.2),school uniform, sitting, softlight,fog",
+                "negative_prompt": "paintings, sketches, (worst quality:2), (low quality:2), (normal quality:2), lowres, ((monochrome)), ((grayscale)), skin spots, acnes, skin blemishes, age spot, glans, extra fingers, fewer fingers",
+                "width": 512,
+                "height": 512,
+                "batch_size": 1,
+                "steps": 2
+            });
+        });
+        // tips
+        $('*[lay-tips]').on('mouseenter', function () {
+            var content = $(this).attr('lay-tips');
+            this.index = layer.tips(content, this, {
+                time: 200000
+            });
+        }).on('mouseleave', function () {
+            layer.close(this.index);
+        });
+    });
+</script>
+</body>
+</html>
